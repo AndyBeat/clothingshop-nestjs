@@ -452,6 +452,10 @@ export async function bootstrap() {
 
     return {
       ...document,
+      info: {
+        ...document.info,
+        title: tag,
+      },
       paths: filteredPaths as OpenAPIObject['paths'],
       components: {
         ...(document.components ?? {}),
