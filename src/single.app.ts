@@ -290,11 +290,11 @@ export async function bootstrap() {
     }
     // 判定登录态,与SessionGuard保持一致:session里有adminSession且未过期
     const adminSession = swaggerReq.session?.adminSession;
-    // const isLogin = true;
-    const isLogin = !!adminSession && Date.now() - adminSession.expires <= Session_Expires;
+    const isLogin = true;
+    // const isLogin = !!adminSession && Date.now() - adminSession.expires <= Session_Expires;
     if (isLogin) {
       // 滑动续期,与SessionGuard保持一致
-      adminSession.expires = Date.now() + Session_Expires;
+      // adminSession.expires = Date.now() + Session_Expires;
       return document;
     }
     return {

@@ -11,4 +11,10 @@ export class AppController {
   gotoIndex() {
     return {};
   }
+
+  // @Get('/swagger-ui')
+  // @Render('swagger-ui')
+  // gotoSwaggerUi() {
+  //   return {};
+  // }
 }
