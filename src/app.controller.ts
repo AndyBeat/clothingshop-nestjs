@@ -12,7 +12,7 @@ export class AppController {
     return {};
   }
 
-  // @Get('/swagger-ui')
+  // @Get(['/swagger-ui', '/swagger-ui/index.html'])
   // @Render('swagger-ui')
   // gotoSwaggerUi() {
   //   return {};

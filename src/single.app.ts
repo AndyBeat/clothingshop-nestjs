@@ -47,6 +47,7 @@ import { ApiTagsDescriptionRegistry } from '@/lib/api-tags-description';
 import expressStaticGzip from 'express-static-gzip';
 import { parse as qsParse } from 'qs';
 import { camelCase } from 'lodash';
+// import swaggerUiDist from 'swagger-ui-dist';
 // import * as crypto from 'node:crypto';
 // import * as passport from 'passport';
 // import * as moment from 'moment';
@@ -92,6 +93,7 @@ export async function bootstrap() {
   const httpPort = config.get<number>('httpPort', 3000);
   const hostName = config.get<string>('hostName', 'localhost');
   const mongooseService = app.get<MongooseConfigService>(MongooseConfigService);
+  const swaggerHost = 'swagger-ui';
   // const syncUpdateCacheService = app.get<SyncUpdateCacheService>(
   //   SyncUpdateCacheService,
   // );
@@ -180,6 +182,9 @@ export async function bootstrap() {
     }),
   );
   app.useStaticAssets(join(process.cwd(), 'public'));
+  // app.useStaticAssets(swaggerUiDist.getAbsoluteFSPath(), {
+  //   prefix: `/${swaggerHost}`, // 正常是项目的前缀+swaggerHost
+  // });
   app.setBaseViewsDir(join(process.cwd(), 'views'));
   app.engine('html', renderFile);
   app.setViewEngine('html');
@@ -235,7 +240,6 @@ export async function bootstrap() {
 
   const apiTagsMap = ApiTagsDescriptionRegistry.scanControllerTags(app);
   const apiDefinitionArray = [];
-  const swaggerHost = 'swagger-ui';
   for (const [key, value] of apiTagsMap) {
     swaggerConfig.addTag(key, value);
     apiDefinitionArray.push({
@@ -314,6 +318,7 @@ export async function bootstrap() {
   };
 
   SwaggerModule.setup(swaggerHost, app, document, {
+    // ui: false, // 重新自定义swagger页面
     swaggerOptions: {
       // 刷新页面后保留已授权的 token，避免重复登录
       persistAuthorization: true, // 这个参数好像是做持久化认证的
