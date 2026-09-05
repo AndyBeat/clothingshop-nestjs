@@ -1,7 +1,7 @@
 /**
  * Create by CC on 2022/6/19
  */
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@andybeat/swagger';
 import { UserSessionDto } from '@/user/dto';
 import { RespPageSchemaDto } from './resp-page-schema.dto';
 

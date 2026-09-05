@@ -2,7 +2,7 @@
  * Create by oliver.wu 2024/10/18
  */
 import { Expose } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@andybeat/swagger';
 
 export class ReqSerializerParamsDto {
   /**

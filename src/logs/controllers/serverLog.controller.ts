@@ -13,7 +13,7 @@ import {
   HttpStatus,
   Body,
 } from '@nestjs/common';
-import { ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ApiOperation, ApiExcludeEndpoint } from '@andybeat/swagger';
 import {
   ApiCommon,
   ApiCustomResponse,

@@ -10,7 +10,7 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import { TokenCacheService } from '@/cache/services';
 import { SequenceSchemaService } from '@/entities/services';
 import { SequenceTypeEnum } from '@/common/enum';

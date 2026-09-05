@@ -8,7 +8,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import { UserService } from './user.service';
 import { CmsSession } from '@/common';
 import {

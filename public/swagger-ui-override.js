@@ -5,7 +5,7 @@
 // window.onload回调里(异步),该同步脚本必然先于onload执行,此时替换SwaggerUIBundle即可赶在真正初始化前
 // 注入oauth2RedirectUrl;另外init.js在调用SwaggerUIBundle(opts)前还会读取其presets/plugins两个静态属性,
 // 包装函数必须透传,否则页面初始化直接报错;脚本里的/swagger-ui前缀需与SwaggerModule.setup第一个参数
-// 保持一致(回调页由@nestjs/swagger把swagger-ui-dist整目录静态挂载在该前缀下自动提供)
+// 保持一致(回调页由@andybeat/swagger把swagger-ui-dist整目录静态挂载在该前缀下自动提供)
 (function () {
   const origin = window.SwaggerUIBundle;
   if (typeof origin !== 'function') { return; }

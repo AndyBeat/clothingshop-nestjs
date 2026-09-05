@@ -1,7 +1,7 @@
 import { IsNotEmpty, Matches, IsString, IsDefined } from 'class-validator';
 import { Expose } from 'class-transformer';
 import { userNameExp } from '@/common';
-import { ApiHideProperty } from '@nestjs/swagger';
+import { ApiHideProperty } from '@andybeat/swagger';
 
 export class ReqUserLoginDto {
   /**

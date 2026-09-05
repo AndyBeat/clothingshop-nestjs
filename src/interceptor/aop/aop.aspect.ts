@@ -33,7 +33,11 @@ export class AopAspect {
   private readonly statisticsUrlCountService: StatisticsUrlCountService;
 
   // 排除不记录日志的url
-  private readonly excludeUrl: string[] = [baseUrl, '/swagger-ui', '/swagger-ui/index.html']
+  private readonly excludeUrl: string[] = [
+    baseUrl,
+    '/swagger-ui',
+    '/swagger-ui/index.html',
+  ];
 
   logAspect(req: RequestSession, res: CmsResponse): void {
     const now = new Date();

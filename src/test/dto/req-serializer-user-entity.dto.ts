@@ -3,7 +3,7 @@
  */
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { ReqSerializerRoleEntityDto } from './req-serializer-role-entity.dto';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@andybeat/swagger';
 
 export class ReqSerializerUserEntityDto {
   /**

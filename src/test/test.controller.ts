@@ -12,7 +12,7 @@ import {
   Headers,
   UseGuards,
 } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@andybeat/swagger';
 import { ConfigService } from '@/common/config';
 import { CodeEnum } from '@/common/enum';
 import { GlobalService, Utils } from '@/common/utils';

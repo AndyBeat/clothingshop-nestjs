@@ -2,7 +2,7 @@
  * Create by oliver.wu 2025/2/13
  */
 import { CreateParentConfigDto } from '../create-parentConfig.dto';
-import { PartialType } from '@nestjs/swagger';
+import { PartialType } from '@andybeat/swagger';
 import { Expose } from 'class-transformer';
 import { IsDefined, IsString, IsMongoId } from 'class-validator';
 

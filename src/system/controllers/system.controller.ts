@@ -8,7 +8,7 @@ import {
   HttpStatus,
   Body,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 
 import {
   ApiCommon,

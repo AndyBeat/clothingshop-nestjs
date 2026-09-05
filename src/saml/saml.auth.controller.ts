@@ -13,7 +13,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 // third party
 import { Response } from 'express';
 // common

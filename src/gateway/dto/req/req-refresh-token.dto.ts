@@ -3,7 +3,7 @@
  */
 import { Expose } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@andybeat/swagger';
 
 export class ReqRefreshTokenDto {
   @ApiProperty({

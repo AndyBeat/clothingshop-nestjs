@@ -1,7 +1,7 @@
 /**
  * Create by oliver.wu 2026/7/15
  */
-import { PartialType, IntersectionType } from '@nestjs/swagger';
+import { PartialType, IntersectionType } from '@andybeat/swagger';
 import { SubRecordOrderDto } from '../subRecord-order.dto';
 import { ReqSubRecordDeleteOrderDto } from './req-subRecord-deleteOrder.dto';
 
