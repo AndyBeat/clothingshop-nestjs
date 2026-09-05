@@ -8,7 +8,7 @@ import {
   DocumentBuilder,
   SwaggerDocumentOptions,
   OpenAPIObject,
-} from '@nestjs/swagger';
+} from '@andybeat/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import type { NestApplicationOptions } from '@nestjs/common';
 
@@ -206,7 +206,7 @@ export async function bootstrap() {
     // 注意2:authorizationUrl/tokenUrl这里只写相对路径作为兜底值,因为启动时无法预知浏览器实际用哪个域名/IP访问swagger-ui;
     //       完整URL由下方patchDocumentOnRequest钩子按每次请求的Host头动态改写成http(s)://{当前域名}/gateway/api/...,
     //       拼出来的origin就是浏览器当前访问swagger-ui的域名,所以依旧不存在跨域问题(项目未开启CORS)
-    // 注意3:回调页由@nestjs/swagger将swagger-ui-dist整目录静态挂载在/swagger-ui前缀下自动提供(public目录无需复制文件);
+    // 注意3:回调页由@andybeat/swagger将swagger-ui-dist整目录静态挂载在/swagger-ui前缀下自动提供(public目录无需复制文件);
     //       redirect_uri问题:swagger-ui默认按"当前页面pathname去掉最后一段"拼接oauth2-redirect.html,无尾斜杠访问
     //       /swagger-ui时目录为空串导致回调页落在根路径;且swaggerOptions是启动时静态序列化进swagger-ui-init.js的,
     //       patchDocumentOnRequest只能改document改不了swaggerOptions,无法按请求域名动态,故由下方customJsStr内联
@@ -276,7 +276,7 @@ export async function bootstrap() {
         ? forwardedProto
         : swaggerReq.protocol;
     const swaggerOrigin = `${swaggerProtocol}://${swaggerReq.get('host')}`;
-    // addOAuth2不传name时securitySchemes的key默认为oauth2(@nestjs/swagger的document-builder默认参数)
+    // addOAuth2不传name时securitySchemes的key默认为oauth2(@andybeat/swagger的document-builder默认参数)
     const oauth2Flows = (
       document.components?.securitySchemes?.[oauthName] as {
         flows?: {
@@ -365,6 +365,7 @@ export async function bootstrap() {
     customSiteTitle: 'CMS Swagger UI',
     customCssUrl: '/swagger-ui-override.css',
     customJs: '/swagger-ui-override.js', // 修改oauth2-redirect.html域名可以不通过修改js
+    customPreLoadJs: ['/swagger-ui-before-load.js'],
     jsonDocumentUrl: `${swaggerHost}/json`, // 默认为swagger-ui-json,可以自定义更换
     yamlDocumentUrl: `${swaggerHost}/yaml`, // 默认为swagger-ui-yaml,可以自定义更换
     // raw: true, // swagger 8.1.0版本新增是否禁用json/yaml,设置false时不会生成json/yaml文件.如果只想有json,设置['json']
@@ -381,7 +382,7 @@ export async function bootstrap() {
   };
   /**
    * 递归遍历任意 OpenAPI 文档片段，收集全部内部组件引用（refs：section → 名称集合）。
-   * 仅识别 '#/components/<section>/<name>' 形态的 $ref（@nestjs/swagger 生成的 DTO 类名
+   * 仅识别 '#/components/<section>/<name>' 形态的 $ref（@andybeat/swagger 生成的 DTO 类名
    * 为纯标识符，不含 RFC3986 转义序列，无需 URI 解码）；$ref 所在对象的同级字段继续深入。
    * @param value 任意 JSON 结构（operation / schema / 数组 / 标量）
    * @param refs 收集结果容器
