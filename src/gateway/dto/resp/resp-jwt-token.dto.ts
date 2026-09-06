@@ -2,7 +2,7 @@
  * Create by CC on 2022/8/9
  */
 import { CommonResult } from '@/common';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@andybeat/swagger';
 
 export class RespJwtTokenDto extends CommonResult {
   @ApiProperty({

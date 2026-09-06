@@ -11,12 +11,15 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "paths":{
       "@/*":["src/*"],
       "@T/*":["test/src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
+    // TS 6.0起strict默认翻转为true,显式关闭以保持升级前的宽松检查行为
+    "strict": false,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,

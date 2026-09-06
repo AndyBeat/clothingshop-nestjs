@@ -26,7 +26,7 @@ import { ApiRights, RightsEnum } from '@/rights';
 
 import { RightsGroupService } from '../services';
 
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import {
   CmsSession,
   DeleteResultDto,

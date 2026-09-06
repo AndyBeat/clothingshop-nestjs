@@ -2,7 +2,7 @@
  * Create by CC on 2022/8/18
  */
 import { Controller, Get, UseGuards, Inject } from '@nestjs/common';
-import { ApiOperation, ApiSecurity } from '@nestjs/swagger';
+import { ApiOperation, ApiSecurity } from '@andybeat/swagger';
 import {
   ApiCommon,
   ApiCustomResponse,

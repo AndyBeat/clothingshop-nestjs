@@ -2,7 +2,7 @@
  * Create by oliver.wu 2024/10/16
  */
 import { CreateTimeZoneDto } from '../timeZone';
-import { PartialType } from '@nestjs/swagger';
+import { PartialType } from '@andybeat/swagger';
 import { Expose } from 'class-transformer';
 import { IsDefined, IsString, IsMongoId } from 'class-validator';
 

@@ -2,7 +2,7 @@
  * Create by oliver.wu 2025/12/8
  */
 import { ModifyRightsCodesDto } from '../modify-rightsCodes.dto';
-import { PartialType } from '@nestjs/swagger';
+import { PartialType } from '@andybeat/swagger';
 import { Expose } from 'class-transformer';
 import { IsDefined, IsString, IsMongoId } from 'class-validator';
 

@@ -8,7 +8,7 @@ import {
   getSchemaPath,
   ApiExtraModels,
   ApiTags,
-} from '@nestjs/swagger';
+} from '@andybeat/swagger';
 import { API_MODEL_PROPERTIES } from '../constants';
 import { ApiTagsDescription } from '@/lib/api-tags-description';
 

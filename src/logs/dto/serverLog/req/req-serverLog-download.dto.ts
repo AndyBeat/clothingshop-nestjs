@@ -4,7 +4,7 @@
 import { Expose } from 'class-transformer';
 import { IsString, Matches } from 'class-validator';
 import { ServerLogViewEnum } from '@/common/enum';
-import { ApiHideProperty } from '@nestjs/swagger';
+import { ApiHideProperty } from '@andybeat/swagger';
 
 export class ReqServerLogDownloadDto {
   /**

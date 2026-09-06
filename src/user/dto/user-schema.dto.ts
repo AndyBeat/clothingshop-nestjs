@@ -1,5 +1,5 @@
 import { UserTypeEnum } from '@/common/enum';
-// import { ApiProperty } from '@nestjs/swagger';
+// import { ApiProperty } from '@andybeat/swagger';
 
 export class UserSchemaDto {
   /**

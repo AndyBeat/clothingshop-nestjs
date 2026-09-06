@@ -5,7 +5,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "plugins": [{
-      "name": "@nestjs/swagger",
+      "name": "@andybeat/swagger",
       "options": {
         "introspectComments": true
       }
