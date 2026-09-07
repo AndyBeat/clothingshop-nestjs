@@ -16,7 +16,7 @@
     ]
   },
   "transformIgnorePatterns": [
-    "node_modules/(?!(uuid)/)"
+    "/node_modules/"
   ],
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/../src/$1",

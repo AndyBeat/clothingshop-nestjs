@@ -26,5 +26,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
+    // TS 6.0起@types不再自动全量加载,显式声明node与jest(jest类型供ts-jest编译spec文件使用)
+    "types": ["node", "jest"],
   }
 }
