@@ -1,5 +1,5 @@
 import { CommonResult } from '@/common';
-import { ApiProperty /*, getSchemaPath*/ } from '@nestjs/swagger';
+import { ApiProperty /*, getSchemaPath*/ } from '@andybeat/swagger';
 // import { TestSchemaDto } from './test-schema.dto';
 
 export class RespPageSchemaDto<T> extends CommonResult {

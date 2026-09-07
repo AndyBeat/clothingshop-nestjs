@@ -2,7 +2,7 @@
  * Create by oliver.wu 2026/7/6
  */
 import { SubRecordCreateMasterDto } from '../subRecord-CreateMaster.dto';
-import { OmitType } from '@nestjs/swagger';
+import { OmitType } from '@andybeat/swagger';
 import { Expose } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 

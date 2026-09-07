@@ -32,6 +32,13 @@ export class AopAspect {
   @Inject()
   private readonly statisticsUrlCountService: StatisticsUrlCountService;
 
+  // 排除不记录日志的url
+  private readonly excludeUrl: string[] = [
+    baseUrl,
+    '/swagger-ui',
+    '/swagger-ui/index.html',
+  ];
+
   logAspect(req: RequestSession, res: CmsResponse): void {
     const now = new Date();
     const url = req.baseUrl;
@@ -105,10 +112,10 @@ export class AopAspect {
         this.memoryCacheService.removeSecuritySession(securityId).then();
       }
 
-      const isIndex = url.indexOf(baseUrl) !== -1; //如果url含有index,说明是网页进来的
+      const isIndex = this.excludeUrl.includes(url); //如果url含有index,说明是网页进来的
       let returnData: string | Record<string, any> = res.returnData;
       try {
-        if (!isXmlRequest && !isSecurityRequest) {
+        if (!isXmlRequest && !isSecurityRequest && !isIndex) {
           returnData = JSON.parse(res.returnData);
         }
         // piiFields.forEach((field) => {

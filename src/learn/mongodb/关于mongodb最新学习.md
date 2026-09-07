@@ -664,3 +664,19 @@ ab -n 500 -c 100 http://localhost:5000/cms/api/user/publicKey
 pm2 7.0版本以上, pm2 start moduleName时报[PM2][ERROR] Script not found: ~\pm2-intercom
 可以使用pm2 kill重新加载module
 ```
+
+### 31 swagger页面初始化问题,神坑
+
+- 1.如果使用 `@andybeat/swagger` 生成swagger页面,出现swagger页面无法加载的问题,需要注意几点
+```
+如果定义了swaggerHost,需要注意网页跳转时是否最后带上/,如果带上/则会变成没有swaggerHost的情况,是使用./生成的路径,如果没有/,则会正常显示界面
+可以使用Postman测试有/和没/的效果,因为浏览器不知道为什么结尾的时候自动带/,真的是神坑
+删除谷歌浏览器的所有缓存就可以了,不需要删除cookie
+```
+- 2.发布包命令的坑
+```
+publish:next": "npm publish --access public --tag next"
+这条命令是发布到next标签的,如果不加--tag next,则会发布到latest标签
+所以以后发布包的时候要注意
+这个不是给当前分支打tag用的
+```

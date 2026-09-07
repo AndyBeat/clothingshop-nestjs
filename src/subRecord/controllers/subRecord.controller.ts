@@ -23,7 +23,7 @@ import { SessionGuard } from '@/guard';
 import { HttpInterceptor } from '@/interceptor/http';
 
 import { SubRecordService } from '../services';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import {
   ReqSubRecordOrderListDto,
   RespSubRecordOrderListDto,

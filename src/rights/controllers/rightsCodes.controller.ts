@@ -29,7 +29,7 @@ import {
   RespRightsCodesSearchDto,
   ReqRightsCodesModifyDto,
 } from '../dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import { CmsSession, RespModifyDataDto } from '@/common';
 
 @ApiCommon()

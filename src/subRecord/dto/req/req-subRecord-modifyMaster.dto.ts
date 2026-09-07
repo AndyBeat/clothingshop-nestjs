@@ -1,7 +1,7 @@
 /**
  * Create by oliver.wu 2026/7/7
  */
-import { PartialType, OmitType } from '@nestjs/swagger';
+import { PartialType, OmitType } from '@andybeat/swagger';
 import { SubRecordModifyMasterDto } from '../subRecord-ModifyMaster.dto';
 import { Expose } from 'class-transformer';
 import { IsDefined, IsMongoId } from 'class-validator';

@@ -11,7 +11,7 @@ import {
   Inject,
   Headers,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import {
   CommonResult,
   RequestSession,

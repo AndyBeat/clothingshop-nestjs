@@ -14,7 +14,7 @@ import {
   Render,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiHeaders } from '@nestjs/swagger';
+import { ApiOperation, ApiHeaders } from '@andybeat/swagger';
 import {
   LoginResult,
   CmsSession,

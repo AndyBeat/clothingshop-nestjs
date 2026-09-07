@@ -2,7 +2,7 @@
  * Create by CC on 2022/6/19
  */
 import { API_MODEL_PROPERTIES_ARRAY } from '@/common';
-import { PickType } from '@nestjs/swagger';
+import { PickType } from '@andybeat/swagger';
 import { Type } from '@nestjs/common';
 
 const isFunction = (val: any): boolean => typeof val === 'function';

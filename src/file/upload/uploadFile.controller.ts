@@ -13,7 +13,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@andybeat/swagger';
 import { SessionGuard } from '@/guard';
 import { HttpInterceptor } from '@/interceptor/http';
 import { CommonResult, RequestSession } from '@/common';

@@ -8,7 +8,7 @@ import {
   DocumentBuilder,
   SwaggerDocumentOptions,
   OpenAPIObject,
-} from '@nestjs/swagger';
+} from '@andybeat/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import type { NestApplicationOptions } from '@nestjs/common';
 
@@ -47,6 +47,7 @@ import { ApiTagsDescriptionRegistry } from '@/lib/api-tags-description';
 import expressStaticGzip from 'express-static-gzip';
 import { parse as qsParse } from 'qs';
 import { camelCase } from 'lodash';
+// import swaggerUiDist from 'swagger-ui-dist';
 // import * as crypto from 'node:crypto';
 // import * as passport from 'passport';
 // import * as moment from 'moment';
@@ -92,6 +93,7 @@ export async function bootstrap() {
   const httpPort = config.get<number>('httpPort', 3000);
   const hostName = config.get<string>('hostName', 'localhost');
   const mongooseService = app.get<MongooseConfigService>(MongooseConfigService);
+  const swaggerHost = 'swagger-ui';
   // const syncUpdateCacheService = app.get<SyncUpdateCacheService>(
   //   SyncUpdateCacheService,
   // );
@@ -180,6 +182,9 @@ export async function bootstrap() {
     }),
   );
   app.useStaticAssets(join(process.cwd(), 'public'));
+  // app.useStaticAssets(swaggerUiDist.getAbsoluteFSPath(), {
+  //   prefix: `/${swaggerHost}`, // 正常是项目的前缀+swaggerHost
+  // });
   app.setBaseViewsDir(join(process.cwd(), 'views'));
   app.engine('html', renderFile);
   app.setViewEngine('html');
@@ -188,7 +193,7 @@ export async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Clothingshop System API')
     .setDescription('The clothingshop restful api')
-    .setVersion('1.0')
+    .setVersion('')
     // .addBearerAuth({
     //   type: 'http',
     //   description: 'AuthorizationCode from CMS',
@@ -201,7 +206,7 @@ export async function bootstrap() {
     // 注意2:authorizationUrl/tokenUrl这里只写相对路径作为兜底值,因为启动时无法预知浏览器实际用哪个域名/IP访问swagger-ui;
     //       完整URL由下方patchDocumentOnRequest钩子按每次请求的Host头动态改写成http(s)://{当前域名}/gateway/api/...,
     //       拼出来的origin就是浏览器当前访问swagger-ui的域名,所以依旧不存在跨域问题(项目未开启CORS)
-    // 注意3:回调页由@nestjs/swagger将swagger-ui-dist整目录静态挂载在/swagger-ui前缀下自动提供(public目录无需复制文件);
+    // 注意3:回调页由@andybeat/swagger将swagger-ui-dist整目录静态挂载在/swagger-ui前缀下自动提供(public目录无需复制文件);
     //       redirect_uri问题:swagger-ui默认按"当前页面pathname去掉最后一段"拼接oauth2-redirect.html,无尾斜杠访问
     //       /swagger-ui时目录为空串导致回调页落在根路径;且swaggerOptions是启动时静态序列化进swagger-ui-init.js的,
     //       patchDocumentOnRequest只能改document改不了swaggerOptions,无法按请求域名动态,故由下方customJsStr内联
@@ -235,7 +240,6 @@ export async function bootstrap() {
 
   const apiTagsMap = ApiTagsDescriptionRegistry.scanControllerTags(app);
   const apiDefinitionArray = [];
-  const swaggerHost = 'swagger-ui';
   for (const [key, value] of apiTagsMap) {
     swaggerConfig.addTag(key, value);
     apiDefinitionArray.push({
@@ -272,7 +276,7 @@ export async function bootstrap() {
         ? forwardedProto
         : swaggerReq.protocol;
     const swaggerOrigin = `${swaggerProtocol}://${swaggerReq.get('host')}`;
-    // addOAuth2不传name时securitySchemes的key默认为oauth2(@nestjs/swagger的document-builder默认参数)
+    // addOAuth2不传name时securitySchemes的key默认为oauth2(@andybeat/swagger的document-builder默认参数)
     const oauth2Flows = (
       document.components?.securitySchemes?.[oauthName] as {
         flows?: {
@@ -291,7 +295,7 @@ export async function bootstrap() {
     // 判定登录态,与SessionGuard保持一致:session里有adminSession且未过期
     const adminSession = swaggerReq.session?.adminSession;
     const isLogin = true;
-    // !!adminSession && Date.now() - adminSession.expires <= Session_Expires;
+    // const isLogin = !!adminSession && Date.now() - adminSession.expires <= Session_Expires;
     if (isLogin) {
       // 滑动续期,与SessionGuard保持一致
       // adminSession.expires = Date.now() + Session_Expires;
@@ -314,6 +318,7 @@ export async function bootstrap() {
   };
 
   SwaggerModule.setup(swaggerHost, app, document, {
+    // ui: false, // 重新自定义swagger页面
     swaggerOptions: {
       // 刷新页面后保留已授权的 token，避免重复登录
       persistAuthorization: true, // 这个参数好像是做持久化认证的
@@ -360,6 +365,7 @@ export async function bootstrap() {
     customSiteTitle: 'CMS Swagger UI',
     customCssUrl: '/swagger-ui-override.css',
     customJs: '/swagger-ui-override.js', // 修改oauth2-redirect.html域名可以不通过修改js
+    customPreLoadJs: ['/swagger-ui-before-load.js'],
     jsonDocumentUrl: `${swaggerHost}/json`, // 默认为swagger-ui-json,可以自定义更换
     yamlDocumentUrl: `${swaggerHost}/yaml`, // 默认为swagger-ui-yaml,可以自定义更换
     // raw: true, // swagger 8.1.0版本新增是否禁用json/yaml,设置false时不会生成json/yaml文件.如果只想有json,设置['json']
@@ -376,7 +382,7 @@ export async function bootstrap() {
   };
   /**
    * 递归遍历任意 OpenAPI 文档片段，收集全部内部组件引用（refs：section → 名称集合）。
-   * 仅识别 '#/components/<section>/<name>' 形态的 $ref（@nestjs/swagger 生成的 DTO 类名
+   * 仅识别 '#/components/<section>/<name>' 形态的 $ref（@andybeat/swagger 生成的 DTO 类名
    * 为纯标识符，不含 RFC3986 转义序列，无需 URI 解码）；$ref 所在对象的同级字段继续深入。
    * @param value 任意 JSON 结构（operation / schema / 数组 / 标量）
    * @param refs 收集结果容器
@@ -452,6 +458,10 @@ export async function bootstrap() {
 
     return {
       ...document,
+      info: {
+        ...document.info,
+        title: tag,
+      },
       paths: filteredPaths as OpenAPIObject['paths'],
       components: {
         ...(document.components ?? {}),
