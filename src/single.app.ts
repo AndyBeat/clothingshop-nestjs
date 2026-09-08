@@ -247,6 +247,7 @@ export async function bootstrap() {
       url: `${swaggerHost}/${camelCase(key)}-json`,
     });
   }
+  apiDefinitionArray.sort((a, b) => a.name.localeCompare(b.name));
 
   const swaggerOptions: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => {
