@@ -254,6 +254,12 @@ export async function bootstrap() {
     operationIdFactory: (controllerKey: string, methodKey: string) => {
       return `${controllerKey}-${methodKey}`; // 这个把_改成了-,因为swagger出现js警告
     },
+    // 方式二写法
+    // operationIdFactory: (controllerKey: string, methodKey: string, version?: string): string =>
+    //   [controllerKey, methodKey, ...(version ? [version] : [])]
+    //     .filter(Boolean)
+    //     .join('_')
+    //     .replace(/[^A-Za-z0-9_]/g, '_'),
     // autoTagControllers: false, // 这个的意思是设置true,那么控制器Controller不使用ApiTags也能创建分类,否则需要显示调用ApiTags来创建分类
     // deepScanRoutes: true // 不懂有什么用
   };
