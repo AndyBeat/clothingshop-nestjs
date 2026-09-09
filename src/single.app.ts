@@ -346,7 +346,7 @@ export async function bootstrap() {
         // scopeSeparator: ' ',
       },
       filter: true,
-      // displayOperationId: true, // 显示OperationId
+      displayOperationId: true, // 显示OperationId
       displayRequestDuration: true, // 显示请求时间
       // docExpansion=none为不展开
       // docExpansion=list为展开
