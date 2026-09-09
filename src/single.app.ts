@@ -250,6 +250,7 @@ export async function bootstrap() {
   apiDefinitionArray.sort((a, b) => a.name.localeCompare(b.name));
 
   const swaggerOptions: SwaggerDocumentOptions = {
+    // 这个设置了,如果不显示,还需要设置displayOperationId=true
     operationIdFactory: (controllerKey: string, methodKey: string) => {
       return `${controllerKey}-${methodKey}`; // 这个把_改成了-,因为swagger出现js警告
     },
@@ -339,7 +340,7 @@ export async function bootstrap() {
         // scopeSeparator: ' ',
       },
       filter: true,
-      displayOperationId: true, // 显示OperationId
+      // displayOperationId: true, // 显示OperationId
       displayRequestDuration: true, // 显示请求时间
       // docExpansion=none为不展开
       // docExpansion=list为展开
