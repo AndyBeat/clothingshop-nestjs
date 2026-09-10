@@ -1,6 +1,6 @@
 {
   "name": "@andybeat/clothingshop-nestjs",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "packageManager": "npm@11.16.0",
   "description": "Typescript Backend Server",
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@andybeat/schedule": "^12.0.1",
-    "@andybeat/swagger": "^12.0.3",
+    "@andybeat/swagger": "^12.0.4",
     "@nestjs/cache-manager": "^12.0.0",
     "@nestjs/common": "^12.0.1",
     "@nestjs/core": "^12.0.1",
@@ -88,7 +88,7 @@
     "rxjs": "^7.8.1",
     "speakeasy": "^2.0.0",
     "stacktrace-js": "^2.0.2",
-    "swagger-ui-express": "^5.0.1",
+    "swagger-ui-dist": "5.32.13",
     "tunnel": "^0.0.6",
     "uuid": "13.0.2",
     "validator": "^13.15.35",

@@ -673,10 +673,35 @@ pm2 7.0版本以上, pm2 start moduleName时报[PM2][ERROR] Script not found: ~\
 可以使用Postman测试有/和没/的效果,因为浏览器不知道为什么结尾的时候自动带/,真的是神坑
 删除谷歌浏览器的所有缓存就可以了,不需要删除cookie
 ```
+
 - 2.发布包命令的坑
 ```
 publish:next": "npm publish --access public --tag next"
 这条命令是发布到next标签的,如果不加--tag next,则会发布到latest标签
 所以以后发布包的时候要注意
 这个不是给当前分支打tag用的
+```
+
+- 3.如果npm发布错误的版本到tag时
+```
+npm dist-tag rm <my-lib> <tag-name> --otp <6位验证码>
+tag和发布的版本没有任何关联,tag可以随时删除,但是latest是必须保留的
+
+latest的版本错误时,可以使用这个更新指定版本
+# 将 latest 标签强制指向 1.0.0 版本
+npm dist-tag add <my-lib>@1.0.0 latest
+
+# 删除前先看当前标签指向
+npm dist-tag ls <my-lib>
+```
+
+- 4.设置npm下载包别名
+```
+如果自己fork了一个包,例如是@nestjs/swagger
+然后修改这个包后,自己发布成@andybeat/swagger
+但是发现代码中import from '@nestjs/swagger'有很多,如果不想改,但是又想使用@andybeat/swagger
+那么就可以使用npm下载的包别名来引用
+实际下载"@andybeat/swagger": "x.x.x", 然后别名下载"@nestjs/swagger": "npm:@andybeat/swagger@x.x.x"即可
+这时候还是import from '@nestjs/swagger',但是实际上使用的是@andybeat/swagger
+
 ```

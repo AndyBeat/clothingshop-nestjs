@@ -90,6 +90,20 @@ git pull xxx/xxx.git branch号
 # 添加远程仓库
 git remote add [仓库分类名:upstream] [原仓库URL]
 
+拉取上流远程分支时不拉取 tags，避免本地仓库的 tags 被覆盖，造成本地仓库的 tags 乱掉。
+例如: git remote add --no-tags upstream https://github.com/username/repository.git
+
 # 获取目标仓库分支
 git fetch [仓库分类名:upstream] [分支名]
+```
+
+```
+.git文件目录新增config
+[remote "upstream"]
+	url = xxx
+	fetch = +refs/heads/*:refs/remotes/upstream/*
+	tagopt = --no-tags
+[user]
+	name = xxx
+	email = xxx
 ```
