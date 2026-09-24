@@ -5,12 +5,10 @@ import { Module, OnModuleDestroy } from '@nestjs/common';
 import { MqttAbstractService, normalizeMqttConfig } from '../services';
 import { MqttController } from '../controllers';
 import { ConfigService } from '@/common/config';
-import { SecretConfigModule } from '@/common/modules';
 import { GLOBAL_CONFIG } from '@/common';
 import cluster from 'node:cluster';
 
 @Module({
-  imports: [SecretConfigModule.register()],
   controllers: [MqttController],
   providers: [
     {
