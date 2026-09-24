@@ -13,6 +13,7 @@ import {
   CONFIG_SECRET,
 } from './config.constants';
 import parseEnv from '@/lib/parseEnv';
+import validator from 'validator';
 
 type ReturnValueOf = string | boolean | number;
 
@@ -73,11 +74,13 @@ export class ConfigService {
       if (fs.existsSync(actualConfigPath)) {
         const actualConfig = this.getConfigRecord(actualConfigPath);
         for (const [key, value] of Object.entries(actualConfig)) {
-          this.orgInternalConfig[key] = value;
-          orgIniConfig[key] = value;
+          if (!key.startsWith('#')) {
+            this.orgInternalConfig[key] = value;
+            orgIniConfig[key] = value;
+          }
         }
         config = orgIniConfig;
-        this.pemConfigPath = actualConfigPath
+        this.pemConfigPath = actualConfigPath;
       }
       // 由于expandVariables始终都是false,所以下面这段代码其实是无效的
       // 先注释掉吧,以后有机会了再修改
@@ -119,8 +122,8 @@ export class ConfigService {
       // regex = new RegExp('^(.+)(?<!=)' + _eq + '(?!=)(.+)$'); // 由于部分配置进行了加密,正则需要匹配
       // regex = new RegExp(`^([^${_eq}.]+)${_eq}(.+)$`); // 由于部分配置进行了加密,正则需要匹配
       regex = new RegExp(`^([^${_eq}]+)${_eq}(.*)$`); // 修改去掉.,当内容为xx.js=xx时无法匹配,待测试
-      // 修改了一下正则: 原^([^${_eq}]+)${_eq}(.+)$, 现在^([^${_eq}]+)${_eq}(.*)$
-      // 把+改成了*,这样设置xxx=空时也能获取到空值而不是没有这个key
+    // 修改了一下正则: 原^([^${_eq}]+)${_eq}(.+)$, 现在^([^${_eq}]+)${_eq}(.*)$
+    // 把+改成了*,这样设置xxx=空时也能获取到空值而不是没有这个key
     // 第一个等号的分隔
     const qs = src.toString();
     if (qs.length === 0) {
@@ -197,25 +200,34 @@ export class ConfigService {
 
   getSecurityConfig(propertyPath: string): string {
     const internalValue = get(this.internalConfig, propertyPath);
-    const isSecurity = ConfigService.transformTypeof(
-      get(this.internalConfig, 'security'),
-    ) as boolean;
-    return !Utils.isUndefined(internalValue) &&
-      typeof isSecurity === 'boolean' &&
-      isSecurity
-      ? Utils.tripleDesDecrypt(
-          internalValue,
-          this.secretConfig['tripleKey'],
-          this.secretConfig['tripleIv'],
-        )
-      : internalValue;
+    // const isSecurity = ConfigService.transformTypeof(
+    //   get(this.internalConfig, 'security'),
+    // ) as boolean;
+    const prefix = 'SEC:';
+    if (
+      internalValue.startsWith(prefix) &&
+      validator.isBase64(internalValue.replace(prefix, ''))
+    ) {
+      return Utils.tripleDesDecrypt(
+        internalValue.replace(prefix, ''),
+        this.secretConfig['tripleKey'],
+        this.secretConfig['tripleIv'],
+      );
+    }
+    const encrypt = Utils.tripleDesEncrypt(
+      internalValue,
+      this.secretConfig['tripleKey'],
+      this.secretConfig['tripleIv'],
+    );
+    this.set(propertyPath, `${prefix}${encrypt}`);
+    return internalValue;
   }
 
   set(key: string, value: string | number | boolean) {
     if (Utils.isEmpty(key)) {
       return;
     }
-    if (value == null || value === '') {
+    if (value == null) {
       unset(this.internalConfig, key);
       unset(this.orgInternalConfig, key);
     } else {
