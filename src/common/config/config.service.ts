@@ -1,17 +1,18 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 // import * as dotenv from 'dotenv';
 import * as fs from 'fs';
-import { resolve, join } from 'path';
-import { get, set, unset, isPlainObject, forEach, cloneDeep } from 'lodash';
-import { DotenvExpandOptions, expand } from 'dotenv-expand';
+import { join, resolve } from 'path';
+import { cloneDeep, forEach, get, isPlainObject, set, unset } from 'lodash';
+// import { DotenvExpandOptions, expand } from 'dotenv-expand';
 import { ConfigServiceOptions } from './config.interface';
 // import { NoInferType, ExcludeUndefinedIf, KeyOf } from '../common.type';
 import { Utils } from '../utils';
 import {
-  CONFIG_OPTIONS,
   CONFIG_ENV_TOKEN,
+  CONFIG_OPTIONS,
   CONFIG_SECRET,
 } from './config.constants';
+import parseEnv from '@/lib/parseEnv';
 
 type ReturnValueOf = string | boolean | number;
 
@@ -19,7 +20,10 @@ type ReturnValueOf = string | boolean | number;
 export class ConfigService {
   private internalConfig: Record<string, any> = {};
   private orgInternalConfig: Record<string, any> = {};
-  private readonly iniFilePath: string = resolve(process.cwd(), 'config.ini');
+  private readonly iniFilePath: string = resolve(
+    process.cwd(),
+    'config/config_example.ini',
+  );
   // private readonly envFilePath: string = resolve(process.cwd(), '.env');
 
   constructor(
@@ -45,19 +49,14 @@ export class ConfigService {
 
   private loadIniFile(): void {
     let config: Record<string, any> = {};
+    // 这里是读第一次模版config.ini
     if (fs.existsSync(this.iniFilePath)) {
       // config = Object.assign(
       //   // 其实用dotenv这个包就可以直接格式化数据,但是由于要重新写入文件,这样会丢失注释的内容,所以还是得自己来格式化了
       //   // dotenv.parse(fs.readFileSync(this.iniFilePath)),
       //   config,
       // );
-      const sourceString = fs.readFileSync(this.iniFilePath, {
-        encoding: this.options.encoding || 'utf-8',
-      });
-      // 由于上传ini文件后,下载下来的文件的换行符是\n,本地使用的是\r\n所以需要做个替换
-      const orgIniConfig = this.parse(
-        sourceString.replace(/(\r\n|\n|\r)/g, '\r\n'),
-      );
+      const orgIniConfig = this.getConfigRecord(this.iniFilePath);
       this.orgInternalConfig = cloneDeep(orgIniConfig);
       // if (!this.options.ignoreEnvVars) {
       //   config = Object.assign(orgIniConfig, this.envConfig);
@@ -65,15 +64,28 @@ export class ConfigService {
       //   config = orgIniConfig;
       // }
       config = orgIniConfig;
-      if (this.options.expandVariables) {
-        const expandOptions: DotenvExpandOptions =
-          typeof this.options.expandVariables === 'object'
-            ? this.options.expandVariables
-            : {};
-        // 2022-06-08 真是又无语了,不知道为什么watch文件时,明明重新加载了,但是经过这个折叠方法
-        // 之后,修改过的值还是旧值,只能暂时把这个参数关闭了
-        config = expand({ ...expandOptions, parsed: config }).parsed || config;
+      // 下面修改获取Config.ini重构逻辑
+      const pemPath = parseEnv.getPemPath();
+      // 修改获取真实config.ini设置,覆盖例子的config内容
+      const actualConfigPath = join(pemPath, 'config.ini');
+      if (fs.existsSync(actualConfigPath)) {
+        const actualConfig = this.getConfigRecord(actualConfigPath);
+        for (const [key, value] of Object.entries(actualConfig)) {
+          this.orgInternalConfig[key] = value;
+        }
+        config = orgIniConfig;
       }
+      // 由于expandVariables始终都是false,所以下面这段代码其实是无效的
+      // 先注释掉吧,以后有机会了再修改
+      // if (this.options.expandVariables) {
+      //   const expandOptions: DotenvExpandOptions =
+      //     typeof this.options.expandVariables === 'object'
+      //       ? this.options.expandVariables
+      //       : {};
+      //   // 2022-06-08 真是又无语了,不知道为什么watch文件时,明明重新加载了,但是经过这个折叠方法
+      //   // 之后,修改过的值还是旧值,只能暂时把这个参数关闭了
+      //   config = expand({ ...expandOptions, parsed: config }).parsed || config;
+      // }
     }
     this.validateConfig(config);
     this.internalConfig = this.options.ignoreEnvVars
@@ -82,6 +94,14 @@ export class ConfigService {
           ...config,
           ...this.envConfig,
         };
+  }
+
+  private getConfigRecord(iniPath: string) {
+    const sourceString = fs.readFileSync(iniPath, {
+      encoding: this.options.encoding || 'utf-8',
+    });
+    // 由于上传ini文件后,下载下来的文件的换行符是\n,本地使用的是\r\n所以需要做个替换
+    return this.parse(sourceString.replace(/(\r\n|\n|\r)/g, '\r\n'));
   }
 
   private parse(

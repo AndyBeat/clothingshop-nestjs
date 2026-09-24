@@ -30,7 +30,10 @@ export class UserSessionService {
 
   verifyToken(language: LanguageType, token: string) {
     try {
-      return jwt.verify(token, this.configService.get<string>('jwtSecret')) as any;
+      return jwt.verify(
+        token,
+        this.configService.get<string>('jwtSecret'),
+      ) as any;
     } catch ({ name, message }) {
       if (name === 'TokenExpiredError') {
         throw new CodeException(

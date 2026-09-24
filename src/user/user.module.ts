@@ -5,10 +5,7 @@ import { AdminSchemaModule } from '@/entities/modules';
 import { MemoryCacheModule } from '@/cache/modules';
 
 @Module({
-  imports: [
-    AdminSchemaModule,
-    MemoryCacheModule,
-  ],
+  imports: [AdminSchemaModule, MemoryCacheModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

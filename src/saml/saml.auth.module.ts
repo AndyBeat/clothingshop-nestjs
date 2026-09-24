@@ -8,10 +8,7 @@ import { SamlAuthController } from './saml.auth.controller';
 import { UserModule } from '@/user';
 
 @Module({
-  imports: [
-    PassportModule.register({ session: true }),
-    UserModule,
-  ],
+  imports: [PassportModule.register({ session: true }), UserModule],
   providers: [SamlStrategy],
   controllers: [SamlAuthController],
 })

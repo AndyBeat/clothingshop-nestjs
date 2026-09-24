@@ -15,9 +15,7 @@ import cluster from 'node:cluster';
       provide: MqttAbstractService,
       // inject: [GLOBAL_CONFIG, SECRET_CONFIG],
       inject: [GLOBAL_CONFIG],
-      useFactory: (
-        configService: ConfigService,
-      ) => {
+      useFactory: (configService: ConfigService) => {
         const workerId = cluster?.worker?.id ?? 1;
         const serverName = configService.get<string>('serverName');
         const clientId = configService.get<string>('mqttClientId');

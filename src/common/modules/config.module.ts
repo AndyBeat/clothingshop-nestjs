@@ -97,10 +97,11 @@ export class ConfigModule {
 
   private static loadSecretFile(): Record<string, any> {
     const pemPath = parseEnv.getPemPath();
-    const secretPath = join(pemPath, 'secret.ini');
+    const secretPath = join(pemPath, 'config.ini');
     let config: Record<string, any> = {};
     if (fs.existsSync(secretPath)) {
-      config = Object.assign(dotenv.parse(fs.readFileSync(secretPath)), config);
+      // config = Object.assign(dotenv.parse(fs.readFileSync(secretPath)), config);
+      config = parseEnv.getEnvIni();
     } else {
       // 如果pem目录不存在则创建一个目录
       // const pemDir = join(process.cwd(), '/pem');
