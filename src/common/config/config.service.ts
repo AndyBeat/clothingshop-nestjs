@@ -231,7 +231,7 @@ export class ConfigService {
       set(this.orgInternalConfig, key, value);
     }
     if (this.options.isWatch) {
-      fs.writeFileSync(this.iniFilePath, this.getMapToString());
+      fs.writeFileSync(this.pemConfigPath, this.getMapToString());
     }
   }
 
