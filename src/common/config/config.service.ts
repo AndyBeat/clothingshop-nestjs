@@ -74,10 +74,8 @@ export class ConfigService {
       if (fs.existsSync(actualConfigPath)) {
         const actualConfig = this.getConfigRecord(actualConfigPath);
         for (const [key, value] of Object.entries(actualConfig)) {
-          if (!key.startsWith('#')) {
-            this.orgInternalConfig[key] = value;
-            orgIniConfig[key] = value;
-          }
+          this.orgInternalConfig[key] = value;
+          orgIniConfig[key] = value;
         }
         config = orgIniConfig;
         this.pemConfigPath = actualConfigPath;
