@@ -190,9 +190,7 @@ export class ConfigService {
   ): ReturnValueOf {
     const internalValue = get(this.internalConfig, propertyPath);
     if (!Utils.isUndefined(internalValue)) {
-      return this.transformTypeof(
-        internalValue,
-      ) as unknown as ReturnValueOf;
+      return this.transformTypeof(internalValue) as unknown as ReturnValueOf;
     }
 
     return defaultValue as ReturnValueOf;
@@ -259,7 +257,7 @@ export class ConfigService {
     }
 
     forEach(this.orgInternalConfig, (value, key) => {
-      if (!Utils.isEmpty(value)) {
+      if (value !== null) {
         if (/^#\d+$/.test(key)) {
           temp.push(value); //-->value\r\n
         } else {
@@ -311,9 +309,7 @@ export class ConfigService {
       console.log(validatedConfig);
       // validatedEnvConfig = validatedConfig;
     } else if (this.options.validationSchema) {
-      const validationOptions = this.getSchemaValidationOptions(
-        this.options,
-      );
+      const validationOptions = this.getSchemaValidationOptions(this.options);
       const { error, value: validatedConfig } =
         this.options.validationSchema.validate(config, validationOptions);
 

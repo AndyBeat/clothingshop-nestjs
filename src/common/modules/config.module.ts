@@ -31,7 +31,10 @@ export class ConfigModule {
     const secretConfig = this.loadSecretFile();
     this.assignVariablesToProcess(envConfig);
     const isToken = !Utils.isEmpty(options.token);
+    // Nestjs中,providers一个元素就会实例化一次对象
+    // 这里就会实例化2次ConfigService
     const providers = [
+      // 这里是第一次实例化
       {
         provide: ConfigService,
         useClass: ConfigService,
@@ -39,8 +42,10 @@ export class ConfigModule {
     ] as ClassProvider[];
     if (isToken) {
       providers.push({
+        // 这里是第二次实例化
         provide: options.token,
         useClass: ConfigService,
+        // useExisting: ConfigService,  // 复用同一个实例，只 new 一次,如果复用同一个实例,不同iniPath不知道会不会有问题
       });
     }
     const configProviderTokens = isToken ? [options.token] : [];
