@@ -30,7 +30,7 @@ import { EventMessageModule } from '@/lib/event-message';
     TasksListModule,
     ApplicationHookModule,
     ConfigModule.register({
-      iniFilePath: join(process.cwd(), '/config/config.ini'),
+      iniFilePath: join(process.cwd(), '/config/config_example.ini'),
       envFilePath:
         process.env.NODE_ENV === 'development'
           ? join(process.cwd(), '/config/.env.development')
