@@ -24,6 +24,7 @@ export class ConfigService {
     process.cwd(),
     'config/config_example.ini',
   );
+  private pemConfigPath: string;
   // private readonly envFilePath: string = resolve(process.cwd(), '.env');
 
   constructor(
@@ -33,6 +34,7 @@ export class ConfigService {
   ) {
     if (!Utils.isEmpty(options.iniFilePath)) {
       this.iniFilePath = options.iniFilePath;
+      this.pemConfigPath = options.iniFilePath;
     }
     // this.iniFilePath = Utils.isEmpty(options.iniFilePath)
     //   ? this.iniFilePath
@@ -72,8 +74,10 @@ export class ConfigService {
         const actualConfig = this.getConfigRecord(actualConfigPath);
         for (const [key, value] of Object.entries(actualConfig)) {
           this.orgInternalConfig[key] = value;
+          orgIniConfig[key] = value;
         }
         config = orgIniConfig;
+        this.pemConfigPath = actualConfigPath
       }
       // 由于expandVariables始终都是false,所以下面这段代码其实是无效的
       // 先注释掉吧,以后有机会了再修改
@@ -154,9 +158,9 @@ export class ConfigService {
 
   private watchConfig(): void {
     //触发这个要保存文件才能立刻触发,如果用Nodejs自动检测会很慢
-    if (fs.existsSync(this.iniFilePath)) {
+    if (fs.existsSync(this.pemConfigPath)) {
       fs.watchFile(
-        this.iniFilePath,
+        this.pemConfigPath,
         {
           persistent: true,
           interval: 1000,
