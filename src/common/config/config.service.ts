@@ -131,13 +131,13 @@ export class ConfigService {
     }
     const strArray = qs.split(_sep);
     strArray.forEach((value, index) => {
-      ConfigService.parseRows(obj, regex, index, value);
+      this.parseRows(obj, regex, index, value);
     });
 
     return obj;
   }
 
-  private static parseRows(
+  private parseRows(
     obj: Record<string, any>,
     regex: RegExp,
     i: number,
@@ -151,7 +151,7 @@ export class ConfigService {
     }
   }
 
-  private static transformTypeof(value: string): ReturnValueOf {
+  private transformTypeof(value: string): ReturnValueOf {
     if (/^-?\d+(\.\d+)?$/.test(value)) {
       return +value;
     } else if (/^(true|false)$/.test(value)) {
@@ -190,7 +190,7 @@ export class ConfigService {
   ): ReturnValueOf {
     const internalValue = get(this.internalConfig, propertyPath);
     if (!Utils.isUndefined(internalValue)) {
-      return ConfigService.transformTypeof(
+      return this.transformTypeof(
         internalValue,
       ) as unknown as ReturnValueOf;
     }
@@ -200,7 +200,7 @@ export class ConfigService {
 
   getSecurityConfig(propertyPath: string): string {
     const internalValue = get(this.internalConfig, propertyPath);
-    // const isSecurity = ConfigService.transformTypeof(
+    // const isSecurity = this.transformTypeof(
     //   get(this.internalConfig, 'security'),
     // ) as boolean;
     const prefix = 'SEC:';
@@ -311,7 +311,7 @@ export class ConfigService {
       console.log(validatedConfig);
       // validatedEnvConfig = validatedConfig;
     } else if (this.options.validationSchema) {
-      const validationOptions = ConfigService.getSchemaValidationOptions(
+      const validationOptions = this.getSchemaValidationOptions(
         this.options,
       );
       const { error, value: validatedConfig } =
@@ -325,7 +325,7 @@ export class ConfigService {
     }
   }
 
-  private static getSchemaValidationOptions(options: ConfigServiceOptions) {
+  private getSchemaValidationOptions(options: ConfigServiceOptions) {
     if (options.validationOptions) {
       if (typeof options.validationOptions.allowUnknown === 'undefined') {
         options.validationOptions.allowUnknown = true;
