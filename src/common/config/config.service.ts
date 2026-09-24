@@ -118,7 +118,9 @@ export class ConfigService {
       _eq = eq || '=',
       // regex = new RegExp('^(.+)(?<!=)' + _eq + '(?!=)(.+)$'); // 由于部分配置进行了加密,正则需要匹配
       // regex = new RegExp(`^([^${_eq}.]+)${_eq}(.+)$`); // 由于部分配置进行了加密,正则需要匹配
-      regex = new RegExp(`^([^${_eq}]+)${_eq}(.+)$`); // 修改去掉.,当内容为xx.js=xx时无法匹配,待测试
+      regex = new RegExp(`^([^${_eq}]+)${_eq}(.*)$`); // 修改去掉.,当内容为xx.js=xx时无法匹配,待测试
+      // 修改了一下正则: 原^([^${_eq}]+)${_eq}(.+)$, 现在^([^${_eq}]+)${_eq}(.*)$
+      // 把+改成了*,这样设置xxx=空时也能获取到空值而不是没有这个key
     // 第一个等号的分隔
     const qs = src.toString();
     if (qs.length === 0) {
