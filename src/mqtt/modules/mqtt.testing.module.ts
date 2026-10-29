@@ -9,12 +9,6 @@ import { SystemConfigSchemaModule } from '@/entities/modules';
 @Module({
   imports: [SystemConfigSchemaModule],
   controllers: [MqttTestingController],
-  providers: [
-    {
-      provide: MqttTestingService,
-      inject: [MqttSingleService],
-      useClass: MqttTestingService,
-    }
-  ],
+  providers: [MqttTestingService, MqttSingleService],
 })
 export class MqttTestingModule {}

@@ -11,8 +11,8 @@ export class MqttSingleService {
   @Inject()
   private readonly systemConfigSchemaService: SystemConfigSchemaService;
 
-  @Inject()
-  private readonly mqttAbstractService: MqttAbstractService;
+  // @Inject()
+  // private readonly mqttAbstractService: MqttAbstractService;
 
   sendMessage(params: MqttPublishInfo) {}
 }
