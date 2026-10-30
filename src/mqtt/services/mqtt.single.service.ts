@@ -50,6 +50,10 @@ export class MqttSingleService {
     if (Utils.isEmpty(mqttUrl)) {
       throw new Error('MQTT not configured');
     }
+    if (this.mqttService) {
+      this.mqttService.stop()
+      await Utils.sleep(200)
+    }
     this.mqttService = new MqttAbstractService(
       normalizeMqttConfig({
         brokerUrl: mqttUrl,
