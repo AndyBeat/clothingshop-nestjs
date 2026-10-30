@@ -12,10 +12,12 @@ export class MqttTestingService {
   @Inject()
   private readonly mqttSingleService: MqttSingleService;
 
-  sendMessage(params: MqttPublishInfo) {
+  async sendMessage(params: MqttPublishInfo) {
     const resp = new CommonResult();
+    // 以后补充其他业务流程
     try {
-      this.mqttSingleService.sendMessage(params);
+      // 到这一步就发消息出去
+      await this.mqttSingleService.sendMessage(params);
     } catch (e) {
       resp.code = CodeEnum.FAIL;
       resp.msg = e.message;
