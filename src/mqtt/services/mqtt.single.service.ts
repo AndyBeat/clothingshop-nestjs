@@ -51,8 +51,8 @@ export class MqttSingleService {
       throw new Error('MQTT not configured');
     }
     if (this.mqttService) {
-      this.mqttService.stop()
-      await Utils.sleep(200)
+      this.mqttService.stop();
+      await Utils.sleep(200);
     }
     this.mqttService = new MqttAbstractService(
       normalizeMqttConfig({
@@ -82,7 +82,7 @@ export class MqttSingleService {
     // 只能使用5s的等待来检测是否连接成功再发了
     for (let i = 0; i <= 5 * 1000; i = i + 100) {
       if (this.mqttService.isConnected()) {
-        break
+        break;
       }
       await Utils.sleep(100);
     }
