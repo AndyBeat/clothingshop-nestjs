@@ -3,9 +3,9 @@
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { MqttPublishInfo } from '@/mqtt/dto';
-
 import { CommonResult } from '@/common';
-import { MqttSingleService } from '@/mqtt';
+import { MqttSingleService } from '../services';
+import { CodeEnum } from '@/common/enum';
 
 @Injectable()
 export class MqttTestingService {
@@ -17,6 +17,7 @@ export class MqttTestingService {
     try {
       this.mqttSingleService.sendMessage(params);
     } catch (e) {
+      resp.code = CodeEnum.FAIL;
       resp.msg = e.message;
     }
     return resp;

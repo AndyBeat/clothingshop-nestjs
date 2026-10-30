@@ -2,7 +2,7 @@
  * Create by oliver.wu 2026/10/29
  */
 import { Module } from '@nestjs/common';
-import { MqttTestingService, MqttSingleService } from '@/mqtt';
+import { MqttTestingService, MqttSingleService } from '../services';
 import { MqttTestingController } from '../controllers';
 import { SystemConfigSchemaModule } from '@/entities/modules';
 

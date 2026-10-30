@@ -3,7 +3,7 @@
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { SystemConfigSchemaService } from '@/entities/services';
-import { MqttAbstractService } from '@/mqtt';
+import { MqttAbstractService } from '../services';
 import { MqttPublishInfo } from '@/mqtt/dto';
 
 @Injectable()

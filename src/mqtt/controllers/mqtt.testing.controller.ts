@@ -19,7 +19,7 @@ import {
 import { SessionGuard } from '@/guard';
 import { HttpInterceptor } from '@/interceptor/http';
 import { ApiOperation } from '@andybeat/swagger';
-import { MqttTestingService } from '@/mqtt';
+import { MqttTestingService } from '../services';
 import { MqttPublishInfo } from '@/mqtt/dto';
 import { CommonResult } from '@/common';
 
@@ -35,8 +35,8 @@ export class MqttTestingController {
   @Post('/send')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: '发送消息',
-    description: '发送消息',
+    summary: '测试发送消息',
+    description: '测试发送消息',
   })
   @ApiCustomResponse({
     type: CommonResult,
