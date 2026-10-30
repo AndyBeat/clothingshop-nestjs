@@ -74,6 +74,14 @@ export class MqttSingleService {
     if (!this.mqttService || this.cacheTime.getTime() < new Date().getTime()) {
       await this.initMqttService();
     }
+    // 由于无法等待创建连接成功再发消息
+    // 只能使用5s的等待来检测是否连接成功再发了
+    for (let i = 0; i <= 5 * 1000; i = i + 100) {
+      if (this.mqttService.isConnected()) {
+        break
+      }
+      await Utils.sleep(100);
+    }
     await this.mqttService.publish(params);
   }
 }
