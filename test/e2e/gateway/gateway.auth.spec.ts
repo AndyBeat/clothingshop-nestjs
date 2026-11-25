@@ -53,40 +53,39 @@ describe('GatewayAuthController (e2e)', () => {
   });
 
   it('/gateway/api/oauth/token oauth授权测试', async () => {
-    await request(app.getHttpServer())
-      .post('/cms/api/user/getSecuritySession')
-      .expect(200)
-      .expect((resp) => {
-        const body = resp.body;
-        expect(body.code).toEqual(1000);
-        securitySession.sessionId = body.sessionId;
-        securitySession.accessKey = body.accessKey;
-        securitySession.vectorValue = body.vectorValue;
-      });
+    // await request(app.getHttpServer())
+    //   .post('/cms/api/user/getSecuritySession')
+    //   .expect(200)
+    //   .expect((resp) => {
+    //     const body = resp.body;
+    //     expect(body.code).toEqual(1000);
+    //     securitySession.sessionId = body.sessionId;
+    //     securitySession.accessKey = body.accessKey;
+    //     securitySession.vectorValue = body.vectorValue;
+    //   });
     const password =
       '043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89';
-    const tripleKey = CryptoJS.lib.WordArray.random(32).toString();
-    const iv = CryptoJS.lib.WordArray.random(12).toString();
-    const tripleKeyParams =
-      tripleKey.slice(0, 32) + securitySession.accessKey.slice(32, 64);
-    const ivParams =
-      iv.slice(0, 12) + securitySession.vectorValue.slice(12, 24);
-    const triplePassword = Utils.tripleDesEncrypt(
-      password,
-      tripleKeyParams,
-      ivParams,
-    );
+    // const tripleKey = CryptoJS.lib.WordArray.random(32).toString();
+    // const iv = CryptoJS.lib.WordArray.random(12).toString();
+    // const tripleKeyParams =
+    //   tripleKey.slice(0, 32) + securitySession.accessKey.slice(32, 64);
+    // const ivParams =
+    //   iv.slice(0, 12) + securitySession.vectorValue.slice(12, 24);
+    // const triplePassword = Utils.tripleDesEncrypt(
+    //   password,
+    //   tripleKeyParams,
+    //   ivParams,
+    // );
+    const aesKey = CryptoJS.lib.WordArray.random(32).toString();
     const securityToken = Utils.rsaPublicEncrypt(
-      JSON.stringify({
-        accessKey: tripleKey,
-        vectorValue: iv,
-      }),
+      aesKey,
       Buffer.from(publicKey, 'base64').toString(),
     );
+    const triplePassword = Utils.aesEncrypt(password, Buffer.from(aesKey, 'hex'));
     return request(app.getHttpServer())
       .post('/gateway/api/oauth/token')
       .set('security-token', securityToken)
-      .set('security-id', securitySession.sessionId)
+      // .set('security-id', securitySession.sessionId)
       .send({
         adminId: 'oliver',
         adminPws: triplePassword,
