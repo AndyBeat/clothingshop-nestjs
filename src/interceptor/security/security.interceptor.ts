@@ -23,10 +23,10 @@ export class SecurityInterceptor implements NestInterceptor {
         if (isSecurityRequest) {
           const securityOptions: SecurityOptions = {
             securityToken: <string>request.headers['security-token'],
-            securityId: <string>request.headers['security-id'],
+            // securityId: <string>request.headers['security-id'],
           };
           const language: LanguageType = Utils.getHeadersLanguage(request);
-          return this.memoryCacheService.tripleDesEncrypt(
+          return this.memoryCacheService.aesDecrypt(
             language,
             JSON.stringify(value),
             securityOptions,

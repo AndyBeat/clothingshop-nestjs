@@ -319,7 +319,7 @@ export class SystemConfigService {
     if (params.isEncrypt) {
       if (isNew || oldParentConfig.value !== newParentConfig.value) {
         //如果是新建或者编辑时value值不一样,就要解密然后服务器加密
-        const plainValue = await this.memoryCacheService.tripleDesDecrypt(
+        const plainValue = await this.memoryCacheService.aesDecrypt(
           session.language,
           params.configValue,
           securityOptions,
@@ -828,7 +828,7 @@ export class SystemConfigService {
         // 如果是新建或者编辑时value值不一样,就要解密然后服务器加密
         // 我知道了,新增加密时进来这里,如果编辑加密时也会进来这里,只是编辑加密时是(旧值***)!=(新值xxx)
         // 这里没有进行新旧值解密后判断是否相等,是因为修改值的时候可能涉及到公私钥的更换问题,直接使用最新的加密更换最好
-        const plainValue = await this.memoryCacheService.tripleDesDecrypt(
+        const plainValue = await this.memoryCacheService.aesDecrypt(
           session.language,
           params.configValue,
           securityOptions,
@@ -1107,7 +1107,7 @@ export class SystemConfigService {
         secretValue.secretText,
         secretPem.privatePem,
       );
-      configInfo.configValue = await this.memoryCacheService.tripleDesEncrypt(
+      configInfo.configValue = await this.memoryCacheService.aesEncrypt(
         session.language,
         plainData,
         securityOptions,

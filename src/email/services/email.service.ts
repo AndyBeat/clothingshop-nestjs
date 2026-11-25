@@ -26,15 +26,23 @@ const DEFAULT_SMTP_PORT = 25;
 
 @Injectable()
 export class EmailService {
-  private readonly transporter: Transporter<SMTPSentMessageInfo, SMTPTransportOptions>;
+  private readonly transporter: Transporter<
+    SMTPSentMessageInfo,
+    SMTPTransportOptions
+  >;
   private readonly emailConfig: EmailConfig;
 
   private readonly logger = new AopLogger(EmailService.name);
 
-  constructor(emailConfig: EmailConfig, private readonly emailUtils: EmailUtils) {
+  constructor(
+    emailConfig: EmailConfig,
+    private readonly emailUtils: EmailUtils,
+  ) {
     this.emailConfig = emailConfig;
     // createTransport 只构造连接器不会立刻建连,SMTP 不可用不会影响服务启动
-    this.transporter = createTransport(this.createTransportOptions(emailConfig));
+    this.transporter = createTransport(
+      this.createTransportOptions(emailConfig),
+    );
   }
 
   /**

@@ -76,7 +76,7 @@ export class SamlStrategy extends PassportStrategy(Strategy, 'saml') {
     params.ssoLogin = true;
     const securityOptions: SecurityOptions = {
       securityToken: '',
-      securityId: '',
+      // securityId: '',
     };
     const result: LoginResult = await this.userService.userLogin(
       LanguageEnum.EN,

@@ -1,41 +1,44 @@
 import * as CryptoJS from 'crypto-js';
-import { tripleDES, ipExp, Supervisor_Rights, IgnoreCaseType } from '@/common';
+import { IgnoreCaseType, ipExp, Supervisor_Rights, tripleDES } from '@/common';
 import {
-  get,
-  isPlainObject,
-  has,
-  forEach,
   cloneDeep,
   cloneDeepWith,
-  set,
-  pick,
+  forEach,
+  get,
+  has,
+  isPlainObject,
   omit,
+  pick,
+  set,
 } from 'lodash';
 import type { Request } from 'express';
 import * as os from 'os';
-import { CmsSession, LanguageType, ErrorPromise } from '../types';
+import { CmsSession, ErrorPromise, LanguageType } from '../types';
 import { v4 as uuidV4 } from 'uuid';
 import { i18n } from '../i18n';
 import { AopLogger } from '@/logger';
-import parseEnv from '@/lib/parseEnv';
-import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+// import parseEnv from '@/lib/parseEnv';
+// import { readFileSync, existsSync } from 'node:fs';
+// import { join } from 'node:path';
 import * as crypto from 'node:crypto';
 import axios from 'axios';
 import { trusted } from 'mongoose';
 
+/**
+ * 2026.11.25 公私钥使用轮换机制,不在设置死在项目里面
+ */
 // RSA公钥和私钥只需加载一次
-const pemPath = parseEnv.getPemPath();
-const publicKeyPath = join(pemPath, 'public-rsa.pem');
-const privatePath = join(pemPath, 'private-rsa.pem');
-let publicKeyPem: string;
-let privateKeyPem: string;
-if (existsSync(publicKeyPath)) {
-  publicKeyPem = readFileSync(publicKeyPath, 'utf8');
-}
-if (existsSync(privatePath)) {
-  privateKeyPem = readFileSync(privatePath, 'utf8');
-}
+// const pemPath = parseEnv.getPemPath();
+// const publicKeyPath = join(pemPath, 'public-rsa.pem');
+// const privatePath = join(pemPath, 'private-rsa.pem');
+// let publicKeyPem: string;
+// let privateKeyPem: string;
+// if (existsSync(publicKeyPath)) {
+//   publicKeyPem = readFileSync(publicKeyPath, 'utf8');
+// }
+// if (existsSync(privatePath)) {
+//   privateKeyPem = readFileSync(privatePath, 'utf8');
+// }
 // ==================== AES-256-GCM 配置常量 ====================
 const ALGORITHM = 'aes-256-gcm';
 const KEY_LENGTH = 32; // AES-256 需要 32 字节密钥
@@ -89,6 +92,7 @@ export class Utils {
    * @param str 加密的内容
    * @param tripleKey 加密的key
    * @param iv
+   * @deprecated
    */
   static tripleDesEncrypt(
     str: string,
@@ -110,6 +114,7 @@ export class Utils {
    * @param str 加密的内容
    * @param session 用户的session
    * @param iv
+   * @deprecated
    */
   static tripleDesEncryptBySession(
     str: string,
@@ -124,6 +129,7 @@ export class Utils {
    * @param str 解密内容
    * @param tripleKey 解密的key
    * @param iv
+   * @deprecated
    */
   static tripleDesDecrypt(
     str: string,
@@ -426,7 +432,10 @@ export class Utils {
       // mode=true就是模糊查询
       return trusted({ $regex: this.escapeString(fieldName), $options: 'i' });
     }
-    return trusted({ $regex: '^' + this.escapeString(fieldName) + '$', $options: 'i' });
+    return trusted({
+      $regex: '^' + this.escapeString(fieldName) + '$',
+      $options: 'i',
+    });
   }
 
   static isSupervisor(session: CmsSession) {
@@ -656,13 +665,18 @@ export class Utils {
   }
 
   // 使用公钥来加密数据
-  static rsaPublicEncrypt(data: string, publicKey: string = publicKeyPem) {
+  static rsaPublicEncrypt(
+    data: string,
+    publicKey: string,
+    padding = crypto.constants.RSA_PKCS1_OAEP_PADDING,
+  ) {
     const buffer = Buffer.from(data);
     try {
       const encrypted = crypto.publicEncrypt(
         {
           key: publicKey,
-          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+          // crypto.constants.RSA_PKCS1_PADDING 或者 crypto.constants.RSA_PKCS1_OAEP_PADDING
+          padding,
         },
         buffer,
       );
@@ -674,25 +688,36 @@ export class Utils {
   }
 
   // 使用私钥解密(公钥加密后的数据)
-  static rsaPrivateDecrypt(data: string, privateKey: string = privateKeyPem) {
+  static rsaPrivateDecrypt(
+    data: string,
+    privateKey: string,
+    padding = crypto.constants.RSA_PKCS1_OAEP_PADDING,
+  ) {
     const buffer = Buffer.from(data, 'base64');
     try {
-      const decrypted = crypto.privateDecrypt(
-        {
-          key: privateKey,
-          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        },
-        buffer,
-      );
-      return decrypted.toString();
+      return crypto
+        .privateDecrypt(
+          {
+            key: privateKey,
+            // crypto.constants.RSA_PKCS1_PADDING 或者 crypto.constants.RSA_PKCS1_OAEP_PADDING
+            padding,
+          },
+          buffer,
+        )
+        .toString();
     } catch (e) {
       this.logger.error(e);
       return null;
     }
   }
 
-  // 使用私钥来加密数据
-  static rsaPrivateEncrypt(data: string, privateKey: string = privateKeyPem) {
+  /**
+   * 使用私钥来加密数据
+   * @param data
+   * @param privateKey
+   * @deprecated
+   */
+  static rsaPrivateEncrypt(data: string, privateKey: string) {
     const buffer = Buffer.from(data);
     try {
       const encrypted = crypto.privateEncrypt(
@@ -709,8 +734,13 @@ export class Utils {
     }
   }
 
-  // 使用公钥来解密(私钥加密的数据)
-  static rsaPublicDecrypt(data: string, publicKey: string = publicKeyPem) {
+  /**
+   * 使用公钥来解密(私钥加密的数据)
+   * @param data
+   * @param publicKey
+   * @deprecated
+   */
+  static rsaPublicDecrypt(data: string, publicKey: string) {
     const buffer = Buffer.from(data, 'base64');
     try {
       const decrypted = crypto.publicDecrypt(

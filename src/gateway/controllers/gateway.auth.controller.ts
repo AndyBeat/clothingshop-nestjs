@@ -83,12 +83,12 @@ export class GatewayAuthController {
     @Req() req: RequestSession,
     @UserLanguage() language: LanguageType,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ) {
     params.allowThirdUser = true;
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     const result: LoginResult = await this.userService.userLogin(
       language,

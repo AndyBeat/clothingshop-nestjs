@@ -107,10 +107,10 @@ export class AopAspect {
       );
       // 删除traceId,traceId逻辑仅只有请求时有效,请求结束后可以删除
       this.traceIdCacheService.deleteTraceIdCache(session).then();
-      const securityId = <string>req.headers['security-id'];
-      if (!Utils.isEmpty(securityId)) {
-        this.memoryCacheService.removeSecuritySession(securityId).then();
-      }
+      // const securityId = <string>req.headers['security-id'];
+      // if (!Utils.isEmpty(securityId)) {
+      //   this.memoryCacheService.removeSecuritySession(securityId).then();
+      // }
 
       const isIndex = this.excludeUrl.includes(url); //如果url含有index,说明是网页进来的
       let returnData: string | Record<string, any> = res.returnData;

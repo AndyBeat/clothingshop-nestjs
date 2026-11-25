@@ -57,11 +57,15 @@ export class SamlAuthController {
     description: 'SSO登录后回调',
   })
   @UseGuards(SamlAuthGuard)
-  async ssoLoginCallback(@Req() req: RequestSession, @Res() res: Response, @Body() params: Record<string, any>) {
+  async ssoLoginCallback(
+    @Req() req: RequestSession,
+    @Res() res: Response,
+    @Body() params: Record<string, any>,
+  ) {
     // RelayState 是登录时,给 IdP 带的version值, Azure 认证后原样带回,属不可信输入,白名单判断
     // const basePath: string = req.body?.RelayState
     // [单点登录传参:第三步]回调时取值
-    const basePath: string = params?.RelayState // 为/sso/login的version参数值
+    const basePath: string = params?.RelayState; // 为/sso/login的version参数值
     // 如果微软校验通过,app认证用户存在则req.user有值
     // 如果有任何错误,直接抛出异常得了
     const authUser = req.user;

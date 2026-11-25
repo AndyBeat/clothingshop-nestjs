@@ -15,18 +15,20 @@ import { LanguageType, SecurityOptions } from '@/common';
 import validator from 'validator';
 
 import { SecuritySessionCacheService } from './security.session.cache.service';
-import type { SecuritySessionStorage } from '@/security';
+// import type { SecuritySessionStorage } from '@/security';
 import { OnEventMessage, SendEventMessage } from '@/lib/event-message';
 import { SecretSchema } from '@/entities/schema';
 
 const publicPemName = 'public-rsa.pem';
 const privatePemName = 'private-rsa.pem';
+const privateAesKeyName = 'private-aes.ini';
 const pemDirectory = 'rsa';
 
 export type SecretPem = {
   publicPem: string;
   privatePem: string;
   secretId: string;
+  aesKey: string;
 };
 export type TripleData = {
   tripleKey: string;
@@ -67,52 +69,100 @@ export class MemoryCacheService {
   // }
 
   async getRsaPublicKey(): Promise<string> {
-    return Utils.stringToBase64(await this.getRsaPublicPem());
+    const secretPem = await this.getLatestRsaPem();
+    return Utils.stringToBase64(secretPem.publicPem);
   }
 
-  async getRsaPublicPem(): Promise<string> {
-    const pemKey = 'rsa-public-pem';
-    let pem = await this.getMemoryCache(pemKey);
-    if (Utils.isEmpty(pem)) {
-      const publicPath = join(this.configService.getPemPath(), publicPemName);
-      if (existsSync(publicPath)) {
-        pem = readFileSync(publicPath, 'utf8');
-      }
-      await this.updateMemoryCache(pemKey, pem);
-    }
-    return pem;
-  }
+  // async getRsaPublicPem(): Promise<string> {
+  //   const pemKey = 'rsa-public-pem';
+  //   let pem = await this.getMemoryCache(pemKey);
+  //   if (Utils.isEmpty(pem)) {
+  //     const publicPath = join(this.configService.getPemPath(), publicPemName);
+  //     if (existsSync(publicPath)) {
+  //       pem = readFileSync(publicPath, 'utf8');
+  //     }
+  //     await this.updateMemoryCache(pemKey, pem);
+  //   }
+  //   return pem;
+  // }
 
-  async getRsaPrivatePem(): Promise<string> {
-    const pemKey = 'rsa-private-pem';
-    let pem = await this.getMemoryCache(pemKey);
-    if (Utils.isEmpty(pem)) {
-      const privatePath = join(this.configService.getPemPath(), privatePemName);
-      if (existsSync(privatePath)) {
-        pem = readFileSync(privatePath, 'utf8');
-      }
-      await this.updateMemoryCache(pemKey, pem);
-    }
-    return pem;
-  }
+  // async getRsaPrivatePem(): Promise<string> {
+  //   const pemKey = 'rsa-private-pem';
+  //   let pem = await this.getMemoryCache(pemKey);
+  //   if (Utils.isEmpty(pem)) {
+  //     const privatePath = join(this.configService.getPemPath(), privatePemName);
+  //     if (existsSync(privatePath)) {
+  //       pem = readFileSync(privatePath, 'utf8');
+  //     }
+  //     await this.updateMemoryCache(pemKey, pem);
+  //   }
+  //   return pem;
+  // }
 
   // 正常逻辑不会在服务器端使用私钥加密或者公钥加密,所以只有使用私钥解密了
   async rsaPrivateDecrypt(data: string) {
-    return Utils.rsaPrivateDecrypt(data, await this.getRsaPrivatePem());
+    return Utils.rsaPrivateDecrypt(
+      data,
+      (await this.getLatestRsaPem()).privatePem,
+    );
   }
 
   // 3DES解密
-  async tripleDesDecrypt(
+  // async tripleDesDecrypt(
+  //   language: LanguageType,
+  //   securityData: string,
+  //   securityOptions: SecurityOptions,
+  // ): Promise<string> {
+  //   const tripleData = await this.getTripleData(language, securityOptions);
+  //   const decryptData = Utils.tripleDesDecrypt(
+  //     securityData,
+  //     tripleData.tripleKey,
+  //     tripleData.iv,
+  //   );
+  //   if (Utils.isEmpty(decryptData)) {
+  //     throw new CodeException(
+  //       CodeEnum.INVALID_TOKEN,
+  //       this.globalService.lang(language, '无效的密文', 'user.securityInvalid'),
+  //     );
+  //   }
+  //   return Promise.resolve(decryptData);
+  // }
+
+  // 3DES加密
+  // async tripleDesEncrypt(
+  //   language: LanguageType,
+  //   plainData: string,
+  //   securityOptions: SecurityOptions,
+  // ) {
+  //   const tripleData = await this.getTripleData(language, securityOptions);
+  //   const encryptData = Utils.tripleDesEncrypt(
+  //     plainData,
+  //     tripleData.tripleKey,
+  //     tripleData.iv,
+  //   );
+  //   return Promise.resolve(encryptData);
+  // }
+
+  // AES加密
+  async aesEncrypt(
+    language: LanguageType,
+    plainData: string,
+    securityOptions: SecurityOptions,
+  ) {
+    // 客户端使用公钥加密AES密钥返回,这里服务器端使用私钥解密出AES Key
+    const aesKey = await this.getAesKey(language, securityOptions);
+    const encryptData = Utils.aesEncrypt(plainData, aesKey);
+    return Promise.resolve(encryptData);
+  }
+
+  // AES解密
+  async aesDecrypt(
     language: LanguageType,
     securityData: string,
     securityOptions: SecurityOptions,
   ): Promise<string> {
-    const tripleData = await this.getTripleData(language, securityOptions);
-    const decryptData = Utils.tripleDesDecrypt(
-      securityData,
-      tripleData.tripleKey,
-      tripleData.iv,
-    );
+    const aesKey = await this.getAesKey(language, securityOptions);
+    const decryptData = Utils.aesDecrypt(securityData, aesKey);
     if (Utils.isEmpty(decryptData)) {
       throw new CodeException(
         CodeEnum.INVALID_TOKEN,
@@ -122,26 +172,11 @@ export class MemoryCacheService {
     return Promise.resolve(decryptData);
   }
 
-  // 3DES加密
-  async tripleDesEncrypt(
-    language: LanguageType,
-    plainData: string,
-    securityOptions: SecurityOptions,
-  ) {
-    const tripleData = await this.getTripleData(language, securityOptions);
-    const encryptData = Utils.tripleDesEncrypt(
-      plainData,
-      tripleData.tripleKey,
-      tripleData.iv,
-    );
-    return Promise.resolve(encryptData);
-  }
-
-  private async getTripleData(
+  private async getAesKey(
     language: LanguageType,
     securityOptions: SecurityOptions,
-  ): Promise<TripleData> {
-    const { securityToken, securityId } = securityOptions;
+  ): Promise<Buffer<ArrayBuffer>> {
+    const { securityToken } = securityOptions;
     if (Utils.isEmpty(securityToken)) {
       throw new CodeException(
         CodeEnum.FAIL,
@@ -152,82 +187,20 @@ export class MemoryCacheService {
         ),
       );
     }
-    if (Utils.isEmpty(securityId)) {
-      throw new CodeException(
-        CodeEnum.FAIL,
-        this.globalService.lang(
-          language,
-          '会话凭证不能为空',
-          'user.securityIdIsEmpty',
-        ),
-      );
-    }
-    const securityCache: SecuritySessionStorage =
-      await this.securitySessionCacheService.getSecuritySessionCache(
-        securityId,
-      );
-    // 先判断securityId是否在服务器内
-    if (Utils.isEmpty(securityCache)) {
-      throw new CodeException(
-        CodeEnum.INVALID_TOKEN,
-        this.globalService.lang(
-          language,
-          '无效的会话ID',
-          'user.securityIdInvalid',
-        ),
-      );
-    }
-    if (
-      !Utils.isEmpty(securityCache.tripleKey) &&
-      !Utils.isEmpty(securityCache.iv)
-    ) {
-      return {
-        tripleKey: securityCache.tripleKey,
-        iv: securityCache.iv,
-      };
-    }
-    // 然后取内存值
-    // 然后以内存的iv值为准解密
-    const aesKey = await this.rsaPrivateDecrypt(securityToken);
+    const secretPem = await this.getLatestRsaPem();
+    const aesKey = Utils.rsaPrivateDecrypt(securityToken, secretPem.privatePem);
     if (Utils.isEmpty(aesKey)) {
       throw new CodeException(
         CodeEnum.INVALID_TOKEN,
-        this.globalService.lang(language, '无效的Token', 'user.tokenInvalid'),
+        this.globalService.lang(language, '无效的密文', 'user.securityInvalid'),
       );
     }
-    const { accessKey, vectorValue } = JSON.parse(aesKey);
-    if (Utils.isEmpty(accessKey) || Utils.isEmpty(vectorValue)) {
-      throw new CodeException(
-        CodeEnum.INVALID_TOKEN,
-        this.globalService.lang(language, '无效的Token', 'user.tokenInvalid'),
-      );
-    }
-    // accessKey必须大于32位,vectorValue必须大于24位
-    if (accessKey.length <= 32 - 1 || vectorValue.length <= 24 - 1) {
-      throw new CodeException(
-        CodeEnum.INVALID_TOKEN,
-        this.globalService.lang(language, '无效的Token', 'user.tokenInvalid'),
-      );
-    }
-    const tripleKey =
-      accessKey.slice(0, 32) + securityCache.accessKey.slice(32, 64);
-    const iv =
-      vectorValue.slice(0, 12) + securityCache.vectorValue.slice(12, 24);
-    securityCache.tripleKey = tripleKey;
-    securityCache.iv = iv;
-    await this.securitySessionCacheService.setSecuritySessionCache(
-      securityId,
-      securityCache,
-    );
-    return {
-      tripleKey,
-      iv,
-    };
+    return Promise.resolve(Buffer.from(aesKey, 'hex'));
   }
 
-  async removeSecuritySession(key: string): Promise<void> {
-    await this.securitySessionCacheService.deleteSecuritySessionCache(key);
-  }
+  // async removeSecuritySession(key: string): Promise<void> {
+  //   await this.securitySessionCacheService.deleteSecuritySessionCache(key);
+  // }
 
   // 获取服务器内部最新的RSA密钥
   async getLatestRsaPem(): Promise<SecretPem> {
@@ -276,10 +249,12 @@ export class MemoryCacheService {
     }
     const publicPem = readFileSync(join(secretPath, publicPemName), 'utf8');
     const privatePem = readFileSync(join(secretPath, privatePemName), 'utf8');
+    const aesKey = readFileSync(join(secretPath, privateAesKeyName), 'utf8');
     secretPem = {
       publicPem,
       privatePem,
       secretId,
+      aesKey,
     };
     await this.updateMemoryCache(secretId, secretPem);
     return Promise.resolve(secretPem);

@@ -66,11 +66,11 @@ export class LoginController {
     @Req() req: RequestSession,
     @UserLanguage() language: LanguageType,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ) {
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     const result: LoginResult = await this.userService.userLogin(
       language,
@@ -117,23 +117,23 @@ export class LoginController {
     return resp;
   }
 
-  @Post('/getSecuritySession')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: '获取一个安全会话',
-    description: '获取安全会话的相关数据',
-  })
-  @ApiCustomResponse({
-    type: RespSecuritySessionDto,
-  })
-  @ApiCommon({ showCredential: false })
-  async getUserSecuritySession() {
-    const storage: SecuritySessionStorage =
-      await this.securitySessionService.getNewSessionStorage();
-    const resp = new RespSecuritySessionDto();
-    resp.sessionId = storage.sessionId;
-    resp.accessKey = storage.accessKey;
-    resp.vectorValue = storage.vectorValue;
-    return resp;
-  }
+  // @Post('/getSecuritySession')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({
+  //   summary: '获取一个安全会话',
+  //   description: '获取安全会话的相关数据',
+  // })
+  // @ApiCustomResponse({
+  //   type: RespSecuritySessionDto,
+  // })
+  // @ApiCommon({ showCredential: false })
+  // async getUserSecuritySession() {
+  //   const storage: SecuritySessionStorage =
+  //     await this.securitySessionService.getNewSessionStorage();
+  //   const resp = new RespSecuritySessionDto();
+  //   resp.sessionId = storage.sessionId;
+  //   resp.accessKey = storage.accessKey;
+  //   resp.vectorValue = storage.vectorValue;
+  //   return resp;
+  // }
 }

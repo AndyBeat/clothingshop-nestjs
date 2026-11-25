@@ -71,7 +71,7 @@ export class UserService {
     const securityPassword = params.adminPws; // 新增密码需要客户端加密后传回来
     let password = '';
     if (!params.ssoLogin) {
-      password = await this.memoryCacheService.tripleDesDecrypt(
+      password = await this.memoryCacheService.aesDecrypt(
         language,
         securityPassword,
         securityOptions,

@@ -14,7 +14,9 @@ import { CodeEnum } from '@/common/enum';
 jest.mock('nodemailer', () => ({ createTransport: jest.fn() }));
 
 /** 捕获业务异常并返回,便于断言状态码与提示信息 */
-async function catchCodeException(promise: Promise<unknown>): Promise<CodeException> {
+async function catchCodeException(
+  promise: Promise<unknown>,
+): Promise<CodeException> {
   try {
     await promise;
   } catch (err) {
@@ -53,7 +55,10 @@ describe('EmailService', () => {
   });
 
   it('未配置密码时不传 auth,非 465 端口不启用 secure', () => {
-    new EmailService({ ...emailConfig, smtpPort: 587, smtpPassword: '' }, emailUtils);
+    new EmailService(
+      { ...emailConfig, smtpPort: 587, smtpPassword: '' },
+      emailUtils,
+    );
     expect(mockedCreateTransport).toHaveBeenLastCalledWith({
       host: 'smtp.example.com',
       port: 587,
@@ -95,7 +100,10 @@ describe('EmailService', () => {
 
     expect(spy).not.toHaveBeenCalled();
     expect(transporter.sendMail).toHaveBeenCalledWith(
-      expect.objectContaining({ to: ['a@example.com', 'b@example.com'], html: '<b>hi</b>' }),
+      expect.objectContaining({
+        to: ['a@example.com', 'b@example.com'],
+        html: '<b>hi</b>',
+      }),
     );
   });
 
@@ -111,7 +119,11 @@ describe('EmailService', () => {
 
   it('收件人为空时抛出业务异常且不调用 sendMail', async () => {
     const err = await catchCodeException(
-      emailService.sendMail({ to: '  ', subject: 'subject', html: '<b>hi</b>' }),
+      emailService.sendMail({
+        to: '  ',
+        subject: 'subject',
+        html: '<b>hi</b>',
+      }),
     );
     expect(err.getStatus()).toBe(CodeEnum.EXCEPTION);
     expect(transporter.sendMail).not.toHaveBeenCalled();
@@ -120,7 +132,11 @@ describe('EmailService', () => {
   it('发送失败时抛出 CodeException 并携带底层错误信息', async () => {
     transporter.sendMail.mockRejectedValue(new Error('connect ECONNREFUSED'));
     const err = await catchCodeException(
-      emailService.sendMail({ to: 'a@example.com', subject: 'subject', html: '<b>hi</b>' }),
+      emailService.sendMail({
+        to: 'a@example.com',
+        subject: 'subject',
+        html: '<b>hi</b>',
+      }),
     );
     expect(err.getStatus()).toBe(CodeEnum.EXCEPTION);
     expect(err.getResponse()).toMatchObject({

@@ -37,15 +37,15 @@ const createRsaKey = () => {
   const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
     modulusLength: 2048, // 密钥长度
     publicKeyEncoding: {
-      type: 'spki',      // 公钥格式标准
-      format: 'pem'      // 输出格式
+      type: 'spki', // 公钥格式标准
+      format: 'pem', // 输出格式
     },
     privateKeyEncoding: {
-      type: 'pkcs8',     // 私钥格式标准
+      type: 'pkcs8', // 私钥格式标准
       format: 'pem',
       // cipher: 'aes-256-cbc', // 可选：对私钥文件进行加密保护
       // passphrase: 'your-secret-passphrase' // 私钥文件的密码
-    }
+    },
   });
 
   // 如果私钥加上了密码,解密的时候也需要加上密码
@@ -59,11 +59,14 @@ const createRsaKey = () => {
 
   fs.writeFileSync(path.join(uuidDir, 'public-rsa.pem'), publicKey);
   fs.writeFileSync(path.join(uuidDir, 'private-rsa.pem'), privateKey);
-  fs.writeFileSync(path.join(uuidDir, 'private-aes.ini'), crypto.randomBytes(32).toString('hex'));
+  fs.writeFileSync(
+    path.join(uuidDir, 'private-aes.ini'),
+    crypto.randomBytes(32).toString('hex'),
+  );
 
   console.log('密钥对生成成功!');
-}
+};
 
 if (Date.now() - latestTime > 30 * 24 * 60 * 60 * 1000) {
-  createRsaKey()
+  createRsaKey();
 }

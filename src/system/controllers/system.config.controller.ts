@@ -98,11 +98,11 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Body() params: ReqParentConfigCreateDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ): Promise<RespSystemConfigCreateDto> {
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     const modifyParams = plainToInstance(ReqParentConfigModifyDto, params);
     return this.systemConfigService.saveSystemParentConfig(
@@ -133,11 +133,11 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Body() params: ReqParentConfigModifyDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ): Promise<RespSystemConfigCreateDto> {
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     return this.systemConfigService.saveSystemParentConfig(
       session,
@@ -184,12 +184,12 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Body() params: ReqParentConfigCheckInfoDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ) {
     const isNew = Utils.isEmpty(params.id);
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     const modifyParams = plainToInstance(ReqParentConfigModifyDto, params);
     return this.systemConfigService.checkInfoParentConfig(
@@ -221,12 +221,12 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Body() params: ReqChildrenConfigCreateDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ): Promise<RespSystemChildrenConfigCreateDto> {
     const modifyParams = plainToInstance(ReqChildrenConfigModifyDto, params);
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     return this.systemConfigService.saveSystemChildrenConfig(
       session,
@@ -256,11 +256,11 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Body() params: ReqChildrenConfigModifyDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ): Promise<RespSystemChildrenConfigCreateDto> {
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     return this.systemConfigService.saveSystemChildrenConfig(
       session,
@@ -290,12 +290,12 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Body() params: ReqChildrenConfigCheckInfoDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ) {
     const isNew = Utils.isEmpty(params.id);
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     const modifyParams = plainToInstance(ReqChildrenConfigModifyDto, params);
     return this.systemConfigService.checkInfoChildrenConfig(
@@ -326,11 +326,11 @@ export class SystemConfigController {
     @UserSession() session: CmsSession,
     @Query() params: ReqSystemConfigSingleDto,
     @Headers('Security-Token') securityToken: string,
-    @Headers('Security-Id') securityId: string,
+    // @Headers('Security-Id') securityId: string,
   ) {
     const securityOptions: SecurityOptions = {
       securityToken,
-      securityId,
+      // securityId,
     };
     return this.systemConfigService.getSystemConfigInfo(
       session,
