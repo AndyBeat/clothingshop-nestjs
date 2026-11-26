@@ -18,6 +18,7 @@ import { Utils } from '@/common/utils';
 import { CodeException } from '@/common/exceptions';
 import { CodeEnum } from '@/common/enum';
 import { AopLogger } from '@/logger';
+import dns from 'node:dns';
 
 /** 隐式 TLS(SSL)端口,该端口需要 secure=true,其余端口由 nodemailer 自动协商 STARTTLS */
 const SMTP_SSL_PORT = 465;
@@ -152,6 +153,60 @@ export class EmailService {
         ? {}
         : { auth: { user: config.smtpSender, pass: config.smtpPassword } }),
     };
+  }
+
+  /** 从发件邮箱域名推导 SMTP 主机；域名未登记时报错并提示手动补充映射表 */
+  public resolveSmtpHost(sender: string) {
+    /** 邮箱域名 → SMTP 主机映射表：新增邮箱商时在这里加一行即可 */
+    const HOST_MAP = {
+      'qq.com': 'smtp.qq.com',
+      '163.com': 'smtp.163.com',
+      '126.com': 'smtp.126.com',
+      'exmail.qq.com': 'smtp.exmail.qq.com', // 腾讯企业邮
+    };
+    const domain = (sender.split('@')[1] || '').toLowerCase();
+    // 腾讯企业邮自有域名没有固定后缀，只认 exmail 字样，其余交给映射表
+    const host = domain.includes('exmail') ? HOST_MAP['exmail.qq.com'] : HOST_MAP[domain];
+    if (!host) {
+      throw new Error(
+        `无法识别邮箱域名「${domain || '空'}」对应的 SMTP 主机，请在上面的 HOST_MAP 中手动加一行，` +
+        `例如腾讯企业邮自有域名：'你的域名': 'smtp.exmail.qq.com'`
+      );
+    }
+    return host;
+  }
+
+  /**
+   * 用操作系统解析器（getaddrinfo）把 SMTP 主机解析成真实 IP。
+   * nodemailer 自带解析走 dns.resolve4（直接询问 DNS 服务器），在开启
+   * fake-ip 的代理环境下会拿到 198.18.x.x 这类不可路由的假地址，表现为
+   * connect ETIMEDOUT；系统解析器（dns.lookup）返回的是真实地址。
+   * 解析失败时原样返回域名，交给 nodemailer 自己处理并报错。
+   */
+  public async lookupHostAddress(hostname: string) {
+    // 例子
+    /**
+     * const hostName = resolveSmtpHost(config.smtpAddress);
+     * const address = await lookupHostAddress(hostName);
+     *
+     * return nodemailer.createTransport({
+     *     host: address,
+     *     port: 465,
+     *     secure: true,
+     *     // host 是 IP 时 nodemailer 不会自动设置 SNI，必须显式指定域名用于证书校验
+     *     servername: hostName,
+     *     auth: { user: SENDER, pass: AUTH_CODE },
+     *   });
+     */
+    try {
+      const { address } = await dns.promises
+        .lookup(hostname, { family: 4 })
+        .catch(() => dns.promises.lookup(hostname));
+      return address;
+    } catch (err) {
+      console.warn(`[警告] 系统解析器无法解析 ${hostname}（${err.code || err.message}），改用 nodemailer 自带解析。`);
+      return hostname;
+    }
   }
 }
 
