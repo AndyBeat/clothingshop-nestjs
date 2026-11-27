@@ -81,34 +81,42 @@ describe('GatewayAuthController (e2e)', () => {
       aesKey,
       Buffer.from(publicKey, 'base64').toString(),
     );
-    const triplePassword = Utils.aesEncrypt(password, Buffer.from(aesKey, 'hex'));
-    return request(app.getHttpServer())
-      .post('/gateway/api/oauth/token')
-      .set('security-token', securityToken)
-      // .set('security-id', securitySession.sessionId)
-      .send({
-        adminId: 'oliver',
-        adminPws: triplePassword,
-      })
-      .expect(200)
-      .expect((resp) => {
-        const body = resp.body;
-        expect(body.code).toEqual(1000);
-        expect(body.accessToken).not.toBeNull();
-        expect(body.refreshToken).not.toBeNull();
-        const accessSession = tokenService.verifyToken('ZH', body.accessToken);
-        const refreshSession = tokenService.verifyToken(
-          'ZH',
-          body.refreshToken,
-        );
-        expect(accessSession.expires).toBeUndefined();
-        expect(refreshSession.expires).not.toBeNull();
-        expect(accessSession.exp - accessSession.iat).toBe(accessExpires);
-        expect(refreshSession.exp - refreshSession.iat).toBe(refreshExpires);
-        expect(refreshSession.expires).toBe(refreshExpires);
-        accessToken = body.accessToken;
-        // refreshToken = body.refreshToken;
-      });
+    const triplePassword = Utils.aesEncrypt(
+      password,
+      Buffer.from(aesKey, 'hex'),
+    );
+    return (
+      request(app.getHttpServer())
+        .post('/gateway/api/oauth/token')
+        .set('security-token', securityToken)
+        // .set('security-id', securitySession.sessionId)
+        .send({
+          adminId: 'oliver',
+          adminPws: triplePassword,
+        })
+        .expect(200)
+        .expect((resp) => {
+          const body = resp.body;
+          expect(body.code).toEqual(1000);
+          expect(body.accessToken).not.toBeNull();
+          expect(body.refreshToken).not.toBeNull();
+          const accessSession = tokenService.verifyToken(
+            'ZH',
+            body.accessToken,
+          );
+          const refreshSession = tokenService.verifyToken(
+            'ZH',
+            body.refreshToken,
+          );
+          expect(accessSession.expires).toBeUndefined();
+          expect(refreshSession.expires).not.toBeNull();
+          expect(accessSession.exp - accessSession.iat).toBe(accessExpires);
+          expect(refreshSession.exp - refreshSession.iat).toBe(refreshExpires);
+          expect(refreshSession.expires).toBe(refreshExpires);
+          accessToken = body.accessToken;
+          // refreshToken = body.refreshToken;
+        })
+    );
   });
 
   it('/gateway/api/oauth/refreshToken 刷新token测试', async () => {
